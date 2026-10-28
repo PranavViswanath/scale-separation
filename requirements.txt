@@ -1,0 +1,4 @@
+numpy
+scipy
+torch>=2.1
+# plus ARC's mlp_cumulant_propagation at commit 93d091a (import name mlp_kprop)
