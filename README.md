@@ -2,13 +2,13 @@
 
 Code for "Solving cumulant propagation's depth problem with scale separation" (WRITEUP.md), a submission to ARC's Algorithmic Contribution Prize.
 
-ARC's cumulant propagation estimates the mean output of a random ReLU MLP without running it, and its paper leaves one regime open: depth growing in proportion to width. There its ladder of approximations stops improving and K4 comes out worse than K3. We trace that to one object, the random overall scale of each layer's activations, separate it exactly using ReLU's positive homogeneity, and carry its variance with an exact recursion.
+ARC's cumulant propagation estimates the mean output of a random ReLU MLP without running it, and its paper leaves one regime open: depth growing in proportion to width. There its ladder of approximations stops improving and K4 comes out worse than K3. I trace that to one object, the random overall scale of each layer's activations, separate it exactly using ReLU's positive homogeneity, and carry its variance with an exact recursion.
 
 ## Results
 
 Depth = width/4, 10 random networks per cell, normalized MSE against Monte Carlo truth in two independent halves, FLOPs counted with ARC's own counter.
 
-| width x depth | ARC's ladder | ours vs naive sampling at equal FLOPs (95% CI) | ours vs ARC's best at our FLOPs |
+| width x depth | ARC's ladder | mine vs naive sampling at equal FLOPs (95% CI) | mine vs ARC's best at my FLOPs |
 |---|---|---|---|
 | 64x16 | K4 worse than K3 on 10/10 nets | 2.31x (1.66 to 3.57) | 2.8x |
 | 128x32 | K4 worse than K3; AUGMENT K3 diverges | 1.57x (1.05 to 2.76) | 4.1x |
