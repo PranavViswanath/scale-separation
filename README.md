@@ -21,7 +21,7 @@ Depth = width/4, 10 random networks per cell, normalized MSE against Monte Carlo
 - ARC's own ladder, run with the scale carried as an exact law, gives a K4 37x better than ARC's K4 at 64x16 and a K3 about 5x better than the best of ARC's ladder at 128x32 and 256x64.
 - The estimator costs about what ARC's K2 costs. Nothing in it is fitted.
 
-At the challenge's own shape, 1024x16, the separation lowers ARC's factored K3 error 1.25x (SIMPLE) and 1.44x (AUGMENT) on every net tested, and switching it off makes my graded entry's score 1.73x worse. Measured 29 Oct 2026, after the write-up was posted; see `challenge_1024x16/`.
+At the challenge's own shape, 1024x16, the separation lowers ARC's factored K3 error 1.25x (SIMPLE) and 1.44x (AUGMENT) on every net tested, and it improves my graded entry's leaderboard score 1.73x. Measured 29 Oct 2026, after the write-up was posted; see `challenge_1024x16/`.
 
 ## The idea in three lines
 

@@ -16,7 +16,7 @@ ARC's mechanistic estimation paper [1] leaves one regime open: matching random s
 2. Why ARC's ladder breaks there: one object, the collective scale mode, which is the random overall size of each layer's activations. Removing it from the state ARC's K4 propagates cuts K4's error 42x and makes the ladder improve with every order again.
 3. The fix has two parts. ReLU's positive homogeneity factors the scale out of every vertex exactly. The scale's variance then has to be carried with its mean-coupled terms: the leading-order rule shrinks toward zero at depth, and with it my margin over sampling fell below 1x at 128x32 and 256x64. With the exact recursion the estimator stays ahead of sampling at every width, through 1024x256.
 4. ARC's own ladder converges again once the scale is carried this way: its K4 is 37x better than ARC's K4 at 64x16, and its K3 is about 5x better than the best ARC's ladder reaches at 128x32 and 256x64.
-5. At the challenge's own shape, 1024x16, the separation lowers ARC's factored K3 error 1.25x (SIMPLE) and 1.44x (AUGMENT) on every net tested, and switching it off makes my graded entry's score 1.73x worse (Section 7).
+5. At the challenge's own shape, 1024x16, the separation lowers ARC's factored K3 error 1.25x (SIMPLE) and 1.44x (AUGMENT) on every net tested, and it improves my graded entry's leaderboard score 1.73x (Section 7).
 
 ![](figures/fig2_matched.png)
 
@@ -138,7 +138,7 @@ The challenge itself is fixed at width 1024 and depth 16. I ran the same separat
 
 *Figure 5. The challenge cell. Each pair of dots is one network, without (gray) and with (blue) scale separation; triangles are means.*
 
-In my graded entry (336823), switching the scale separation off makes the leaderboard score 1.73x worse (6.79e-9 to 1.17e-8, 12/12 nets, same compute).
+In my graded entry (336823), the scale separation improves the leaderboard score 1.73x (1.17e-8 to 6.79e-9, 12/12 nets, same compute).
 
 These measurements were made on 29 October 2026, after this write-up was first posted; scripts are in `challenge_1024x16/`.
 

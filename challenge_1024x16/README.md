@@ -7,7 +7,7 @@ The challenge's own networks (Phase 2 public dataset, mini split, nets 0 to 11) 
 | SIMPLE, final-layer MSE | 3.89e-8 | 3.11e-8 | 1.25x | 12/12 |
 | AUGMENT, final-layer MSE | 1.93e-8 | 1.34e-8 | 1.44x | 6/6 |
 
-Graded entry 336823 with the separation switched off: leaderboard score 1.73x worse (6.79e-9 to 1.17e-8, 12/12 nets, same compute).
+In graded entry 336823 the separation improves the leaderboard score 1.73x (1.17e-8 to 6.79e-9, 12/12 nets, same compute).
 
 ## Files
 
