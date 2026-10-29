@@ -17,9 +17,9 @@ ARC's mechanistic estimation paper [1] leaves one regime open: matching random s
 3. The fix has two parts. ReLU's positive homogeneity factors the scale out of every vertex exactly. The scale's variance then has to be carried with its mean-coupled terms: the leading-order rule shrinks toward zero at depth, and with it my margin over sampling fell below 1x at 128x32 and 256x64. With the exact recursion the margin stays above 1.4x at every width.
 4. ARC's own ladder converges again once the scale is carried this way: its K4 is 37x better than ARC's K4 at 64x16, and its K3 is about 5x better than the best ARC's ladder reaches at 128x32 and 256x64.
 
-![](figures/fig0_diagonal.png)
+![](figures/fig2_matched.png)
 
-*Figure 1. Depth = width/4, 10 random nets per cell, every method at its own FLOPs. Above the dashed line a method beats naive sampling. Blue: my estimator, with 95% intervals. Dashed grey: the same estimator with the leading-order scale variance. Orange: ARC's K2 (the level at my cost) and ARC's K3 (not run at 512); ARC's K4 inverts or diverges in every cell where it runs.*
+*Figure 1. Depth = width/4, 10 random nets per cell. For each cell: ARC's best estimate at or below my FLOPs, naive sampling at my FLOPs, and mine. Bold: how many times lower my error is than sampling's.*
 
 Everything below uses ARC's repository (commit 93d091a, unmodified) [2], its FLOP counter, many random nets per cell, and predictions written down with timestamps before the numbers were computed.
 
@@ -78,9 +78,9 @@ E|h|‚Å¥ comes from the law's own pair moments. At leading order this reads V' ‚â
 
 ## 4. Results on the diagonal
 
-![](figures/fig2_matched.png)
+![](figures/fig0_diagonal.png)
 
-*Figure 3. Depth = width/4, 10 random nets per cell. For each cell: ARC's best estimate at or below my FLOPs, naive sampling at my FLOPs, and mine. Bold: how many times lower my error is than sampling's.*
+*Figure 3. Depth = width/4, 10 random nets per cell, every method at its own FLOPs. Above the dashed line a method beats naive sampling. Blue: my estimator, with 95% intervals. Dashed grey: the same estimator with the leading-order scale variance. Orange: ARC's K2 (the level at my cost) and ARC's K3 (not run at 512); ARC's K4 inverts or diverges in every cell where it runs.*
 
 | width x depth | vs naive sampling (95% CI) | nets beating sampling | vs ARC's best at equal or lower FLOPs |
 |---|---|---|---|
