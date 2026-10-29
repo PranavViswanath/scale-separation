@@ -2,7 +2,7 @@
 
 Code for "Solving cumulant propagation's depth problem with scale separation" (WRITEUP.md), a submission to ARC's Algorithmic Contribution Prize.
 
-ARC's cumulant propagation estimates the mean output of a random ReLU MLP without running it, and its paper leaves one regime open: depth growing in proportion to width. ARC states it in footnote 7 of their post on the paper, [Mechanistic estimation for wide random MLPs](https://www.alignment.org/blog/mechanistic-estimation-for-wide-random-mlps/): "It remains an open problem to match the performance of random sampling for random MLPs in other regimes, for example, with the depth growing linearly in the width." There its ladder of approximations stops improving and K4 comes out worse than K3. I trace that to one object, the random overall scale of each layer's activations, separate it exactly using ReLU's positive homogeneity, and carry its variance with an exact recursion.
+ARC's cumulant propagation estimates the mean output of a random ReLU MLP without running it, and its paper leaves one regime open: depth growing in proportion to width. ARC states it in footnote 7 of their post on the paper, [Mechanistic estimation for wide random MLPs](https://www.alignment.org/blog/mechanistic-estimation-for-wide-random-mlps/): "It remains an open problem to match the performance of random sampling for random MLPs in other regimes, for example, with the depth growing linearly in the width." In that regime ARC's ladder of approximations stops improving and K4 comes out worse than K3. I trace that to one object, the random overall scale of each layer's activations, separate it exactly using ReLU's positive homogeneity, and carry its variance with an exact recursion.
 
 ## Results
 
