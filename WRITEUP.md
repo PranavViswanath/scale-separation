@@ -43,7 +43,7 @@ I also reproduce the paper's 256x8 observation: K4 there is slightly worse than 
 
 ## 2. Why: the collective scale mode
 
-At finite width the squared norm of a layer, |h|²/n, fluctuates from input to input, and the fluctuation grows with depth over width [5, 6, 7]. It is one collective coordinate shared by every neuron. A truncated cumulant list carries it as large, correlated fourth and higher cumulants across every pair of neurons, and truncating those is what makes higher orders hurt.
+At finite width the squared norm of a layer, $\lVert h \rVert^2/n$, fluctuates from input to input, and the fluctuation grows with depth over width [5, 6, 7]. It is one collective coordinate shared by every neuron. A truncated cumulant list carries it as large, correlated fourth and higher cumulants across every pair of neurons, and truncating those is what makes higher orders hurt.
 
 The test is direct. At 64x16 I de-scale the state ARC's dense chain propagates at every layer (factor out the scale, propagate the shape, nothing fitted):
 
@@ -60,19 +60,25 @@ The inversion disappears and the ladder becomes monotone.
 
 Model each pre-activation layer as
 
-  z = √S (m + g),  g ~ N(0, C),  S ~ Gamma(mean 1, variance V).
+$$z = \sqrt{S}\,(m + g), \qquad g \sim \mathcal{N}(0, C), \qquad S \sim \mathrm{Gamma}(\text{mean } 1,\ \text{variance } V).$$
 
-ReLU is positively homogeneous, so ReLU(√S y) = √S ReLU(y), and every moment factorizes exactly:
+ReLU is positively homogeneous, so $\mathrm{ReLU}(\sqrt{S}\,y) = \sqrt{S}\,\mathrm{ReLU}(y)$, and every moment factorizes exactly:
 
-  E[h_j^a h_l^b] = E[S^((a+b)/2)] × (the same moment of a Gaussian with mean m and covariance C).
+$$\mathbb{E}\big[h_j^{a}\,h_l^{b}\big] \;=\; \mathbb{E}\big[S^{(a+b)/2}\big]\;\cdot\;\mathbb{E}_{y\sim\mathcal{N}(m,C)}\big[\mathrm{ReLU}(y_j)^{a}\,\mathrm{ReLU}(y_l)^{b}\big].$$
 
 The vertex is one Gaussian vertex times closed-form Gamma moments, with no quadrature over the scale. The state per layer is the mean, the covariance and the scalar V, and m and C are exact functions of the carried mean and covariance.
 
-The part that decides the deep regime is how V moves from layer to layer. Averaging the norm statistic of the next layer over the fresh weights gives an exact equation in quantities the law already knows. With a = E h, K = Cov h and s1(V) = E√S:
+The part that decides the deep regime is how V moves from layer to layer. Averaging the norm statistic of the next layer over the fresh weights gives an exact equation in quantities the law already knows. With $a = \mathbb{E}\,h$, $K = \mathrm{Cov}\,h$ and $s_1(V) = \mathbb{E}\sqrt{S}$:
 
-  (1 + V') [N0 − |a|⁴ (4b + 2b²)] = E|h|⁴,  b = 1/s1(V')² − 1,  N0 = (|a|² + tr K)² + 2 tr K² + 4 aᵀKa.
+$$(1 + V')\,\Big[N_0 - \lVert a\rVert^4\,(4b + 2b^2)\Big] = \mathbb{E}\,\lVert h\rVert^4, \qquad b = \frac{1}{s_1(V')^2} - 1,$$
 
-E|h|⁴ comes from the law's own pair moments. At leading order this reads V' ≈ (Σ κ4(h)_jjll + 4 a·β) / ((tr K)² + 2 tr K² + 2|a|² tr K + 4 aᵀKa), where β is the trace of κ3(h). The simpler rule without the mean-coupled terms underestimates the scale variance at depth by 0.10 to 0.19 and drifts toward zero as width grows. The exact recursion tracks the true value to within 0.01 on 7 of 9 development nets. Nothing is fitted to truth, and the cost is the covariance propagation ARC's K2 already does plus a pair vertex.
+$$N_0 = \big(\lVert a\rVert^2 + \operatorname{tr}K\big)^2 + 2\operatorname{tr}K^2 + 4\,a^{\top}K a.$$
+
+$\mathbb{E}\,\lVert h\rVert^4$ comes from the law's own pair moments. At leading order this reads
+
+$$V' \approx \frac{\sum_{j,l} \kappa_4(h)_{jjll} + 4\,a\cdot\beta}{(\operatorname{tr}K)^2 + 2\operatorname{tr}K^2 + 2\lVert a\rVert^2\operatorname{tr}K + 4\,a^{\top}K a},$$
+
+where $\beta$ is the trace of $\kappa_3(h)$. The simpler rule without the mean-coupled terms underestimates the scale variance at depth by 0.10 to 0.19 and drifts toward zero as width grows. The exact recursion tracks the true value to within 0.01 on 7 of 9 development nets. Nothing is fitted to truth, and the cost is the covariance propagation ARC's K2 already does plus a pair vertex.
 
 ---
 
@@ -113,7 +119,7 @@ The higher levels run on ARC's dense or factored chain, which is expensive at th
 
 ## 6. Where this leaves the deep regime
 
-Across four widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x. The fitted width exponent is −0.21 (95% interval −0.45 to +0.01): the interval includes a constant margin and excludes the 1/√n decay that would mean losing to sampling in the limit. That was the pre-registered pass line, and it passes. So on the depth = width/4 diagonal, at a cost of order ARC's K2, the estimator stays ahead of sampling by a roughly constant factor as width grows, with the lower end of the interval at 256x64 touching 1 (0.96). Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
+Across four widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x. The fitted width exponent is −0.21 (95% interval −0.45 to +0.01): the interval includes a constant margin and excludes the $1/\sqrt{n}$ decay that would mean losing to sampling in the limit. That was the pre-registered pass line, and it passes. So on the depth = width/4 diagonal, at a cost of order ARC's K2, the estimator stays ahead of sampling by a roughly constant factor as width grows, with the lower end of the interval at 256x64 touching 1 (0.96). Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
 
 ---
 
@@ -123,7 +129,7 @@ Across four widths, each double the last, the margin over sampling goes 2.3x, 1.
 - Cells: the diagonal 64x16, 128x32, 256x64 and 512x128 (10 nets each); also 128x16, 256x8 (10 each) and a wide control at 256x4 (5).
 - Truth: Monte Carlo in two independent halves. Error is the cross-half product, so truth noise cancels, normalized by the output variance and averaged over nets with bootstrap intervals. The label noise floor is at least 1,700x below every error reported.
 - Baselines: ARC's repository unmodified, in float64: SIMPLE and AUGMENT, K1 to K4, factored for K >= 3. "ARC's best" at a FLOP level is the best estimate from any of those variants at that FLOP level or below.
-- Compute: ARC's NamedFlopCounter for every method, plus a hand count of special-function evaluations. Naive sampling costs 2n²(L+1) FLOPs per sample.
+- Compute: ARC's NamedFlopCounter for every method, plus a hand count of special-function evaluations. Naive sampling costs $2n^2(L+1)$ FLOPs per sample.
 - Pre-registration: every test's prediction and pass line was written down with a timestamp before its numbers were computed. Results that failed their lines are in the repository alongside the passes.
 
 ## Scope
