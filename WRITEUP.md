@@ -2,7 +2,7 @@
 
 *A fit-free estimator that beats sampling at every width tested when depth grows with width*
 
-Pranav Viswanath
+Pranav Viswanath · [X](https://x.com/pranavxviswa)
 
 Code: https://github.com/PranavViswanath/scale-separation
 
