@@ -62,6 +62,7 @@ Everything in this repository outside `extensions/` and `challenge_1024x16/`, th
 | `evaluation/expo.py` | the width exponent of the margin over sampling, with bootstrap intervals |
 | `docs/VRULE.md` | derivation of the exact scale-variance recursion |
 | `docs/PREREG.md` | the timestamped predictions, written before each result, with the outcomes (file names in it are as they were when stamped) |
+| `docs/build_pdf.sh`, `docs/writeup.css` | rebuild WRITEUP.pdf from WRITEUP.md |
 | `figures/figs.py` | the figures in the write-up |
 
 ## Running a cell

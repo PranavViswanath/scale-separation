@@ -20,4 +20,4 @@ In graded entry 336823 the separation improves the leaderboard score 1.73x (1.17
 | `graded_entry_336823.py` | graded entry 336823 as submitted; the separation is switched by `V30_DESCALE` (MIT notice for its base in `LICENSE-504aldo-V29`) |
 | `graded_ablation.sh` | runs the graded entry through the official local runner with the switch on and off |
 
-AUGMENT K3 at 1024 needs more than 110 GB in float64; it was run in float32, which reproduces net 1's float64 result to four digits (net 0 is the float64 run).
+On one GPU, ARC's K2 and my estimator take seconds per net, factored K3 SIMPLE about 20 s and AUGMENT about 2 minutes. AUGMENT K3 at 1024 needs more than 110 GB in float64; it was run in float32, which reproduces net 1's float64 result to four digits (net 0 is the float64 run).
