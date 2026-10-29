@@ -16,6 +16,7 @@ ARC's mechanistic estimation paper [1] leaves one regime open: matching random s
 2. Why ARC's ladder breaks there: one object, the collective scale mode, which is the random overall size of each layer's activations. Removing it from the state ARC's K4 propagates cuts K4's error 42x and makes the ladder improve with every order again.
 3. The fix has two parts. ReLU's positive homogeneity factors the scale out of every vertex exactly. The scale's variance then has to be carried with its mean-coupled terms: the leading-order rule shrinks toward zero at depth, and with it my margin over sampling fell below 1x at 128x32 and 256x64. With the exact recursion the estimator stays ahead of sampling at every width, through 1024x256.
 4. ARC's own ladder converges again once the scale is carried this way: its K4 is 37x better than ARC's K4 at 64x16, and its K3 is about 5x better than the best ARC's ladder reaches at 128x32 and 256x64.
+5. At the challenge's own shape, 1024x16, on the challenge's nets and truth, my graded entry (336823) carries scale separation, and switching it off makes the entry's leaderboard score 1.73x worse on 12 of 12 nets at the same compute. Inside ARC's factored K3 it lowers the final-layer error 1.25x (SIMPLE) and 1.44x (AUGMENT), on every net tested (Section 7).
 
 ![](figures/fig2_matched.png)
 
@@ -124,10 +125,33 @@ Across five widths, each double the last, the margin over sampling goes 2.3x, 1.
 
 ---
 
+## 7. The challenge cell, 1024x16
+
+The diagonal is ARC's open regime; the challenge itself is fixed at width 1024 and depth 16, where depth/width is 1/64 and the scale mode is small (the carried scale variance over all 16 layers is about 0.005 in the runs below). I measured the same idea there, on the challenge's own networks (the Phase 2 public dataset, mini split, nets 0 to 11) against their 1e9-sample truth, scored the way the grader scores: final-layer MSE, and for the graded entry the leaderboard's adjusted score from the official local runner.
+
+| method at 1024x16 | without scale separation | with scale separation | gain | nets improved | compute |
+|---|---|---|---|---|---|
+| graded entry 336823, adjusted score (official runner) | 1.17e-8 | 6.79e-9 | 1.73x | 12/12 | 0.256 of budget, both |
+| graded entry 336823, final-layer MSE | 4.59e-8 | 2.65e-8 | 1.73x | 12/12 | |
+| ARC factored K3 SIMPLE, final-layer MSE | 3.89e-8 | 3.11e-8 | 1.25x | 12/12 | |
+| ARC factored K3 AUGMENT, final-layer MSE | 1.93e-8 | 1.34e-8 | 1.44x | 6/6 | |
+
+![](figures/fig5_challenge.png)
+
+*Figure 5. The challenge cell. Each pair of dots is one network, without (gray) and with (blue) scale separation; triangles are means.*
+
+- **The graded entry.** My leaderboard entry is a K3 chain built on 504aldo's public V29 estimator (MIT license, credited in the code). My addition is the scale separation: after every ReLU the state is re-represented as an independent scale times a shape, and the chain continues on the shape. The code has a single switch for it; with the switch off it runs its base's operations exactly. The ablation changes nothing else, and the compute differs by 0.1 %.
+- **ARC's ladder.** The same separation, inserted between the layers of ARC's unmodified factored K3, lowers the final-layer error on every net, for both kinds. These runs use the log-normal scale law with its variance read from the carried (2,2) cumulant trace, the form that fits ARC's harmonic tensors; the Gamma law of Section 3 is the form for my own estimator.
+- **My standalone estimator** is a K2-cost method, and at this shape it is 3.3x better than ARC's SIMPLE K2 but 1.3x worse than ARC's AUGMENT K2 (12/12 nets), as I predicted before running it. At 1024x16 the separation pays as a layer on top of a higher-order chain, which is how the graded entry uses it.
+
+These measurements were made on 29 October 2026, after this write-up was first posted. They were pre-registered like the rest (docs/PREREG.md, section C1), and the scripts are in `challenge_1024x16/`.
+
+---
+
 ## Method
 
 - Networks: ARC's MLP class, He initialization, no bias, fixed seeds. Development nets (separate seeds) were used only to freeze numerics and check the variance recursion, and are excluded from every score.
-- Cells: the diagonal 64x16, 128x32, 256x64, 512x128 and 1024x256 (10 nets each); also 128x16, 256x8 (10 each) and a wide control at 256x4 (5).
+- Cells: the diagonal 64x16, 128x32, 256x64, 512x128 and 1024x256 (10 nets each); also 128x16, 256x8 (10 each) and a wide control at 256x4 (5). The challenge cell 1024x16 uses the challenge's own nets and truth (Section 7).
 - Truth: Monte Carlo in two independent halves. Error is the cross-half product, so truth noise cancels, normalized by the output variance and averaged over nets with bootstrap intervals. The label noise floor is at least 180x below every error reported. Per-net results and intervals are in the repository.
 - Baselines: ARC's repository unmodified, in float64: SIMPLE and AUGMENT, K1 to K4, factored for K >= 3. "ARC's best" at a FLOP level is the best estimate from any of those variants at that FLOP level or below.
 - Compute: ARC's NamedFlopCounter for every method, plus a hand count of special-function evaluations. Naive sampling costs $2n^2(L+1)$ FLOPs per sample.
@@ -138,6 +162,7 @@ Across five widths, each double the last, the margin over sampling goes 2.3x, 1.
 - In wide, shallow networks (256x8, 256x4) ARC's AUGMENT K2 was about 2x better than my estimator with the leading-order variance, at similar cost. The scale mode is small there, and ARC's higher orders stay ahead wherever they converge.
 - With the exact variance recursion, first-order and exact Gamma moments give the same accuracy on the diagonal. The gain comes from separating the scale and carrying its variance correctly.
 - The pre-registered exact variance rule is reported in every cell. At 512x128 the leading-order rule happens to score higher (1.96x); at 128x32, 256x64 and 1024x256 it falls below sampling, and the exact rule stays ahead at all five widths.
+- At the challenge shape (1024x16) my standalone K2-cost estimator is 1.3x worse than ARC's AUGMENT K2; the scale separation helps there as a layer on a K3 chain (Section 7).
 - One prediction failed: a one-neuron series argument predicted that ARC's ladder would keep improving through K4, and at 64x16 it inverts at K4. The multi-neuron test in Section 2 is what identifies the cause.
 
 ## Epistemic status and AI use

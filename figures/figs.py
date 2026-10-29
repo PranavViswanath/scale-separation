@@ -110,3 +110,33 @@ ax.set_yscale("log"); ax.set_ylim(1.2e-3, 12); ax.set_yticks([0.001, 0.01, 0.1, 
 ax.set_ylabel("times better than naive sampling\n(equal FLOPs, mean of 10 random nets)"); ax.set_xlabel("width x depth, with depth = width / 4")
 ax.set_title("Depth growing with width: the regime ARC lists as open", loc="left", color=INK, fontsize=11.5)
 fig.tight_layout(); fig.savefig("fig0_diagonal.png")
+
+# ---- Fig 5: the challenge cell, 1024x16 (Phase 2 public nets, 1e9-sample truth), with and without scale separation ----
+# challenge_1024x16/README.md and docs/PREREG.md C1. Per-net final-layer MSE (1e-8).
+CH = [("Graded entry 336823\n(official runner, 12 nets)",
+       [5.36, 4.51, 5.05, 5.27, 4.86, 3.59, 3.80, 4.17, 5.00, 4.75, 4.10, 4.61],
+       [2.46, 2.31, 2.73, 2.79, 2.66, 2.51, 2.51, 3.02, 2.33, 3.16, 2.58, 2.74]),
+      ("ARC factored K3 SIMPLE\n(12 nets)",
+       [3.71, 4.46, 4.59, 4.09, 3.63, 3.23, 3.61, 3.66, 4.41, 3.78, 3.64, 3.83],
+       [2.78, 3.34, 3.22, 3.38, 3.26, 2.97, 2.96, 3.22, 2.80, 3.18, 3.00, 3.22]),
+      ("ARC factored K3 AUGMENT\n(6 nets)",
+       [2.06, 1.99, 2.08, 2.18, 1.83, 1.45],
+       [1.31, 1.42, 1.46, 1.43, 1.27, 1.15])]
+fig, ax = plt.subplots(figsize=(7.0, 3.6)); grid(ax)
+rng = np.random.default_rng(0)
+for i, (lab, off, on) in enumerate(CH):
+    y = len(CH) - 1 - i; off = np.array(off); on = np.array(on); jit = rng.uniform(-0.13, 0.13, len(off))
+    for a, b, j in zip(off, on, jit):
+        ax.plot([a, b], [y + j, y + j], color="#c9c8c3", lw=0.9, zorder=1)
+    ax.scatter(off, y + jit, s=22, color=MC, zorder=2); ax.scatter(on, y + jit, s=22, color=OURS, zorder=3)
+    ax.plot([off.mean()], [y + 0.3], "v", color=MC, ms=8); ax.plot([on.mean()], [y + 0.3], "v", color=OURS, ms=8)
+    ax.annotate(f"{off.mean() / on.mean():.2f}x lower, {int((on < off).sum())}/{len(on)} nets", (on.mean(), y + 0.3),
+                textcoords="offset points", xytext=(-6, 5), ha="right", color=INK, fontsize=9, fontweight="bold")
+ax.set_yticks(range(len(CH))); ax.set_yticklabels([c[0] for c in CH][::-1], fontsize=9)
+ax.set_xscale("log"); ax.set_xlim(1.0, 6.5); ax.set_xticks([1, 2, 3, 4, 6]); ax.set_xticklabels(["1", "2", "3", "4", "6"])
+ax.set_ylim(-0.45, len(CH) - 0.35)
+ax.set_xlabel("final-layer MSE (x 1e-8), challenge truth")
+ax.scatter([], [], s=22, color=MC, label="without scale separation"); ax.scatter([], [], s=22, color=OURS, label="with scale separation")
+ax.legend(frameon=False, fontsize=8.5, loc="lower right")
+ax.set_title("The challenge cell, width 1024, depth 16", loc="left", color=INK, fontsize=11.5)
+fig.tight_layout(); fig.savefig("fig5_challenge.png")

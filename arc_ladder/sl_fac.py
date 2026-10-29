@@ -1,6 +1,7 @@
 """sl_fac.py cell [kind]: SL3 = ARC's FACTORED K3 chain (factor=True, unmodified) + the factored de-scaling hook (descale_fac_src.py,
 descale_tower, verbatim) with the EXACT Gamma scale law (h = sqrt(S) G, S ~ Gamma(1, V), S' = sqrt(S)/E sqrt S), V from the carried
 kappa4 (2,2) trace by the R186a rule. Output = shape mean. Flops: ARC NamedFlopCounter over everything. Also runs V = 0 (plain ARC K3) as the gate."""
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "estimator"))
 import sys, math, time, logging, numpy as np, torch
 logging.disable(logging.WARNING)
 torch.set_grad_enabled(False); torch.backends.cuda.matmul.allow_tf32 = False; torch.cuda.set_per_process_memory_fraction(0.35)
@@ -10,7 +11,7 @@ from mlp_kprop.factor_k3 import FactoredTensor
 from mlp_kprop.flop_utils import NamedFlopCounter, flop_name
 import lvlib
 dev = torch.device("cuda"); dt = torch.float64; torch.set_default_dtype(dt)
-exec(open("descale_fac_src.py").read())
+exec(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "descale_fac_src.py")).read())
 def gamma_law(V):
     s1 = lvlib.gmom(V, .5); E = {k: lvlib.gmom(V, k / 2) / s1**k for k in range(1, 5)}
     return {1: 1.0, 2: E[2] - 1, 3: E[3] - 3 * E[2] + 2, 4: E[4] - 4 * E[3] - 3 * E[2]**2 + 12 * E[2] - 6}, E

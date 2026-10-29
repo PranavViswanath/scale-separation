@@ -123,7 +123,7 @@ Independence across layers gives the product. $\square$
 
 This is the norm part of Hanin and Nica's log-normal result [5]. I include it because it pins down the depth problem's parameter: the scale variance is a function of $L/n$, small when the network is wide and shallow and of order one on the diagonal.
 
-**Quenched versus annealed.** ARC's problem fixes the weights and averages over $x$ only. The scale variance that matters there is the input-conditional part, which is smaller. Measured on development nets at depth it is 0.12 to 0.22 (`../VRULE.md`, Section 4). Theorem 5 gives the annealed law and the scaling variable, not the quenched value. The estimator does not use Theorem 5; it tracks the quenched $V$ with Proposition 6.
+**Quenched versus annealed.** ARC's problem fixes the weights and averages over $x$ only. The scale variance that matters there is the input-conditional part, which is smaller. Measured on development nets at depth it is 0.12 to 0.22 (`../docs/VRULE.md`, Section 4). Theorem 5 gives the annealed law and the scaling variable, not the quenched value. The estimator does not use Theorem 5; it tracks the quenched $V$ with Proposition 6.
 
 ---
 
@@ -157,7 +157,7 @@ $$(1 + V')\Big[N_0 - \lVert a\rVert^4\,(4b + 2b^2)\Big] = T_4, \qquad N_0 = \big
 **Consequences.**
 
 - The rule matches the inherited scale exactly: if $h$ itself carries a scale $S$ independent of its shape, both $T_4$ and the law side carry the factor $\mathbb{E}S^2$.
-- The leading-order rule drops the mean-coupled terms $4\,a^\top K a$ and $\lVert a\rVert^4(4b + 2b^2)$. On a mean-dominated (rank-collapsed) state these terms are not small, which is why the leading-order $V$ drifts toward zero at large width (`../VRULE.md`).
+- The leading-order rule drops the mean-coupled terms $4\,a^\top K a$ and $\lVert a\rVert^4(4b + 2b^2)$. On a mean-dominated (rank-collapsed) state these terms are not small, which is why the leading-order $V$ drifts toward zero at large width (`../docs/VRULE.md`).
 
 ---
 
@@ -175,7 +175,7 @@ $$(1 + V')\Big[N_0 - \lVert a\rVert^4\,(4b + 2b^2)\Big] = T_4, \qquad N_0 = \big
 **Not proved.**
 
 - An error bound for the estimator on fixed-weight networks. The law is exact for the scale but Gaussian for the shape. The shape's own non-Gaussianity, per Theorem 3(c), is diluted by width but not removed. The margins in the write-up are measured, not derived.
-- That the Gamma family is the exact scale law beyond the input. It is exact at the input (Proposition 2), and the matched $V$ agrees with independent truth statistics to about 3 % (`../VRULE.md`), but deeper layers are not proved to be Gamma.
+- That the Gamma family is the exact scale law beyond the input. It is exact at the input (Proposition 2), and the matched $V$ agrees with independent truth statistics to about 3 % (`../docs/VRULE.md`), but deeper layers are not proved to be Gamma.
 - That Theorem 4 is the specific mechanism of ARC's K3 to K4 inversion inside their code. Theorem 4 concerns the scale law. The causal link to ARC's ladder is the de-scaling experiment, which is measured.
 - The quenched scale variance. Theorem 5 is annealed over weights.
 

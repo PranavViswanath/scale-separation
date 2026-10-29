@@ -21,6 +21,8 @@ Depth = width/4, 10 random networks per cell, normalized MSE against Monte Carlo
 - ARC's own ladder, run with the scale carried as an exact law, gives a K4 37x better than ARC's K4 at 64x16 and a K3 about 5x better than the best of ARC's ladder at 128x32 and 256x64.
 - The estimator costs about what ARC's K2 costs. Nothing in it is fitted.
 
+At the challenge's own shape, 1024x16 (the challenge's nets and 1e9-sample truth), switching scale separation off in my graded entry 336823 makes its leaderboard score 1.73x worse (6.79e-9 to 1.17e-8, 12/12 nets, same compute). Inside ARC's factored K3 it lowers the final-layer error 1.25x (SIMPLE, 12/12 nets) and 1.44x (AUGMENT, 6/6). These were measured on 29 Oct 2026, after the write-up was first posted; see `challenge_1024x16/`.
+
 ## The idea in three lines
 
 Model each pre-activation layer as z = sqrt(S) (m + g), with g Gaussian and S a Gamma-distributed scale of variance V.
@@ -29,28 +31,38 @@ Carry the mean, the covariance and V; the next layer's V solves an exact equatio
 
 ## Phase 2 submission and later work
 
-Everything in this repository outside `extensions/`, through the 1024x256 cell, is my Phase 2 Algorithmic Contribution to ARC. That state is tagged `phase2-submission`.
+Everything in this repository outside `extensions/` and `challenge_1024x16/`, through the 1024x256 cell, is my Phase 2 Algorithmic Contribution to ARC. That state is tagged `phase2-submission`; the tag keeps the original flat file layout, and the folders here only move those files.
 
-`extensions/` holds work I did afterwards, on my own, extending the theory. It is not part of the submission. I share it in case it is useful to ARC.
+`challenge_1024x16/` holds measurements made after the write-up was posted, on the submitted entry and on ARC's ladder at the challenge shape; the write-up's Section 7 reports them. `extensions/` holds work I did afterwards, on my own, extending the theory. It is not part of the submission. I share it in case it is useful to ARC.
 
-## Files
+## Layout
+
+| folder | contents |
+|---|---|
+| `estimator/` | the estimator and its checks |
+| `arc_ladder/` | ARC's ladder, unmodified, and the same ladder with the scale carried as a law |
+| `evaluation/` | networks, Monte Carlo truth and scoring |
+| `docs/` | the variance-rule derivation and the pre-registration log |
+| `figures/` | the write-up's figures and the script that draws them |
+| `challenge_1024x16/` | the challenge cell: ARC's K2 and K3 with and without the scale law, and the graded entry with and without it |
+| `extensions/` | post-submission work (see above) |
 
 | file | what it does |
 |---|---|
-| `lvlib.py` | the estimator: law vertex, both variance rules (`lvt2_chain`, `solve_V2`) |
-| `lv2.py` | runs the estimator with the exact variance rule, plus the leading-order rule and first-order controls |
-| `verify_v2.py` | checks the variance recursion against exact samples of the law, without truth |
-| `VRULE.md` | derivation of the exact scale-variance recursion |
-| `conv.py` | the truth-free convergence rule that sets the pair-vertex quadrature |
-| `expo.py` | the width exponent of the margin over sampling, with bootstrap intervals |
-| `nets.py` | builds the random networks with fixed seeds, using ARC's MLP class |
-| `mc.py` | Monte Carlo truth in two independent halves, plus antithetic and radial-exact sampler variances |
-| `arc.py` | ARC's ladder, SIMPLE and AUGMENT, K1 to K4, unmodified |
-| `dsc.py`, `descale_src.py` | de-scaling ARC's dense chain (the 42x test and the dense K4 ladder) |
-| `sl_fac.py`, `descale_fac_src.py` | ARC's factored K3 with the exact scale law |
-| `ana.py` | scores every method: errors, bootstrap intervals, ratios against sampling and ARC's best |
+| `estimator/lvlib.py` | the estimator: law vertex, both variance rules (`lvt2_chain`, `solve_V2`) |
+| `estimator/lv2.py` | runs the estimator with the exact variance rule, plus the leading-order rule and first-order controls |
+| `estimator/verify_v2.py` | checks the variance recursion against exact samples of the law, without truth |
+| `estimator/conv.py`, `estimator/convI.py` | the truth-free convergence rule that sets the pair-vertex quadrature |
+| `arc_ladder/arc.py` | ARC's ladder, SIMPLE and AUGMENT, K1 to K4, unmodified |
+| `arc_ladder/dsc.py`, `arc_ladder/descale_src.py` | de-scaling ARC's dense chain (the 42x test and the dense K4 ladder) |
+| `arc_ladder/sl_fac.py`, `arc_ladder/descale_fac_src.py` | ARC's factored K3 with the exact scale law |
+| `evaluation/nets.py` | builds the random networks with fixed seeds, using ARC's MLP class |
+| `evaluation/mc.py` | Monte Carlo truth in two independent halves, plus antithetic and radial-exact sampler variances |
+| `evaluation/ana.py` | scores every method: errors, bootstrap intervals, ratios against sampling and ARC's best |
+| `evaluation/expo.py` | the width exponent of the margin over sampling, with bootstrap intervals |
+| `docs/VRULE.md` | derivation of the exact scale-variance recursion |
+| `docs/PREREG.md` | the timestamped predictions, written before each result, with the outcomes (file names in it are as they were when stamped) |
 | `figures/figs.py` | the figures in the write-up |
-| `PREREG.md` | the timestamped predictions, written before each result, with the outcomes |
 
 ## Running a cell
 
@@ -60,6 +72,6 @@ Install ARC's `mlp_cumulant_propagation` (commit 93d091a) so that `mlp_kprop` im
 ./run_cell.sh F 128 32 10
 ```
 
-That builds 10 nets at width 128 and depth 32, computes the truth, runs ARC's ladder and the estimator, and prints the comparison table. A cell at this size takes minutes on one GPU, apart from the Monte Carlo truth.
+Everything it writes goes to `runs/`. That builds 10 nets at width 128 and depth 32, computes the truth, runs ARC's ladder and the estimator, and prints the comparison table. A cell at this size takes minutes on one GPU, apart from the Monte Carlo truth.
 
-The de-scaled ladders run separately on a cell built the same way. `python dsc.py B 3S:k22,4S:k22` is the 42x test (log-normal scale), `python dsc.py B 3S:gam,4S:gam` uses the exact Gamma law, and `python sl_fac.py B` is the factored K3 version.
+The de-scaled ladders run separately, from `runs/`, on a cell built the same way. `python ../arc_ladder/dsc.py B 3S:k22,4S:k22` is the 42x test (log-normal scale), `python ../arc_ladder/dsc.py B 3S:gam,4S:gam` uses the exact Gamma law, and `python ../arc_ladder/sl_fac.py B` is the factored K3 version.

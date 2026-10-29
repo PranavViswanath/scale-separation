@@ -3,6 +3,7 @@
 Between layers (not after the last): h = S'.G, S' lognormal (E 1, Var v), v from the chain's own state (k22 or energy), Leonov-Shiryaev inversion,
 chain continues on G; output = shape mean at the last layer (positive homogeneity: E S' = 1). Nothing fitted. Flops: ARC NamedFlopCounter on everything.
 GPU allocator capped at 40 % of memory (in-process OOM instead of host thrash)."""
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "estimator"))
 import sys, math, time, itertools, logging, numpy as np, torch
 logging.disable(logging.WARNING)
 torch.set_grad_enabled(False); torch.backends.cuda.matmul.allow_tf32 = False
@@ -12,7 +13,7 @@ from mlp_kprop.flop_utils import NamedFlopCounter, flop_name
 cell = sys.argv[1]; variants = sys.argv[2].split(",")   # e.g. 2S:none,3S:k22,4S:energy
 d = np.load(f"nets_{cell}.npz"); Wall = d["W"]; n = int(d["n"]); L = int(d["L"]); scale = d["init_scale"]
 dev = torch.device("cuda"); dt = torch.float64; torch.set_default_dtype(dt)
-src = open("descale_src.py").read(); exec(src)   # set_partitions, join_is_full, PARTS, LETTERS, scaled_cumulants, descale, lognormal_cums, choose_v, dense_tower
+src = open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "descale_src.py")).read(); exec(src)   # set_partitions, join_is_full, PARTS, LETTERS, scaled_cumulants, descale, lognormal_cums, choose_v, dense_tower
 import lvlib
 def gamma_cums(V):
     s1 = lvlib.gmom(V, .5); E = {k: lvlib.gmom(V, k / 2) / s1**k for k in range(1, 5)}
