@@ -1,0 +1,41 @@
+== Theorem 1: homogeneity factorization ==
+  E[h1^1 h2^0]  sampled 0.606753  factorized 0.606635  z = +0.94
+  E[h1^2 h2^1]  sampled 0.729798  factorized 0.728923  z = +0.85
+  E[h1^2 h2^2]  sampled 1.131441  factorized 1.129321  z = +0.65
+  E[h1^3 h2^1]  sampled 1.831847  factorized 1.828713  z = +0.65
+== Proposition 2: input radial scale, fixed weights ==
+  max |f(x) - |x|/sqrt(n) f(sqrt(n) x/|x|)| = 4.88e-15
+  E sqrt(S0): sampled 0.992283  Gamma(mean 1, var 2/n) formula 0.992219  var(S0) 0.06249 vs 2/n = 0.06250
+== Theorem 3: cumulants of the scale mode (exact arithmetic) ==
+  V = 1/10  r = 2: kappa_4/kappa_2^2 = 3/10  predicted 3/10  odd kappa_3 = 0
+  V = 1/10  r = 3: kappa_6/kappa_2^3 = 3/10  predicted 3/10  odd kappa_5 = 0
+  V = 1/10  r = 4: kappa_8/kappa_2^4 = 63/100  predicted 63/100  odd kappa_7 = 0
+  V = 1/10  r = 5: kappa_10/kappa_2^5 = 567/250  predicted 567/250  odd kappa_9 = 0
+  V = 1/10  r = 6: kappa_12/kappa_2^6 = 6237/500  predicted 6237/500  odd kappa_11 = 0
+  V = 1/4  r = 2: kappa_4/kappa_2^2 = 3/4  predicted 3/4  odd kappa_3 = 0
+  V = 1/4  r = 3: kappa_6/kappa_2^3 = 15/8  predicted 15/8  odd kappa_5 = 0
+  V = 1/4  r = 4: kappa_8/kappa_2^4 = 315/32  predicted 315/32  odd kappa_7 = 0
+  V = 1/4  r = 5: kappa_10/kappa_2^5 = 2835/32  predicted 2835/32  odd kappa_9 = 0
+  V = 1/4  r = 6: kappa_12/kappa_2^6 = 155925/128  predicted 155925/128  odd kappa_11 = 0
+  excess kurtosis of a unit readout w.z (scale mixture, V = 0.1) vs w.h (independent ReLU coordinates):
+    n =    64: mixture 0.3021 (predicted 3V = 0.3000)   independent +0.0846 (predicted +0.0870, O(1/n)); sampling SE about 0.007
+    n =  1024: mixture 0.3128 (predicted 3V = 0.3000)   independent +0.0046 (predicted +0.0068, O(1/n)); sampling SE about 0.007
+== Theorem 4: the moment expansion over the scale diverges ==
+  k = 1: Gram-Charlier coefficient +0.19947114   binom(1/2,k)/sqrt(2 pi) +0.19947114
+  k = 2: Gram-Charlier coefficient -0.04986779   binom(1/2,k)/sqrt(2 pi) -0.04986779
+  k = 3: Gram-Charlier coefficient +0.02493389   binom(1/2,k)/sqrt(2 pi) +0.02493389
+  k = 4: Gram-Charlier coefficient -0.01558368   binom(1/2,k)/sqrt(2 pi) -0.01558368
+  k = 5: Gram-Charlier coefficient +0.01090858   binom(1/2,k)/sqrt(2 pi) +0.01090858
+  V = 0.02: smallest term at k = 27 (0.6/V = 30.0); |partial sum - E sqrt S| at k = 1..4: 2.5e-03, 3.2e-06, 4.7e-05, 1.9e-06; at k = 60: 7.9e-06
+  V = 0.05: smallest term at k = 12 (0.6/V = 12.0); |partial sum - E sqrt S| at k = 1..4: 6.2e-03, 2.0e-05, 2.9e-04, 3.0e-05; at k = 60: 5.0e+11
+  V = 0.10: smallest term at k =  7 (0.6/V =  6.0); |partial sum - E sqrt S| at k = 1..4: 1.2e-02, 8.3e-05, 1.2e-03, 2.4e-04; at k = 60: 3.9e+25
+  V = 0.20: smallest term at k =  3 (0.6/V =  3.0); |partial sum - E sqrt S| at k = 1..4: 2.5e-02, 3.5e-04, 4.6e-03, 1.9e-03; at k = 60: 3.1e+40
+== Theorem 5: annealed scale variance (1 + 5/n)^L ==
+  n = 16: E rho 0.99992 (1), E rho^2 1.31241 (1 + 5/n = 1.31250)
+  n = 64: E rho 1.00017 (1), E rho^2 1.07857 (1 + 5/n = 1.07812)
+  random nets n = 16, L = 6, x fixed: E|h_L|^4/(E|h_L|^2)^2 = 5.1923 +- 0.2585   (1 + 5/n)^L = 5.1121
+  depth = width/4: (1 + 5/n)^(n/4) - 1 = 2.332 (n=64), 2.449 (n=256), 2.480 (n=1024); limit e^(5/4) - 1 = 2.490
+== Proposition 6: the variance recursion is exact W-averaged matching ==
+  E|u + xi|^4: sampled 180.8403 +- 0.1254   N0 - |a|^4 (4b + 2b^2) = 180.8893
+  moment match: s1 u = a True, C + (1 - s1^2) u u^T = K True
+  E_W |Wv|^4 / (w2^2 |v|^4): sampled 623.74   m^2 + 2m = 624

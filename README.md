@@ -27,6 +27,19 @@ Model each pre-activation layer as z = sqrt(S) (m + g), with g Gaussian and S a 
 ReLU(sqrt(S) y) = sqrt(S) ReLU(y), so every moment is E[S^(k/2)] times the matching Gaussian moment, exactly.
 Carry the mean, the covariance and V; the next layer's V solves an exact equation for its norm statistic, built from the law's own moments.
 
+## Theory
+
+`THEOREM.md` proves what the method rests on:
+
+- separating the scale is exact for any positively homogeneous activation;
+- the input scale is exactly Gamma for fixed weights;
+- linear layers dilute every per-neuron non-Gaussianity but carry the shared scale undiminished into every even cumulant order;
+- a moment or cumulant hierarchy over the scale is a divergent series whose useful orders shrink as the scale variance grows;
+- the scale variance is governed by depth over width;
+- the variance recursion is exact fourth-moment matching.
+
+It also states what is not proved. `python verify_theorem.py` checks every statement in about 15 seconds on a CPU.
+
 ## Files
 
 | file | what it does |
@@ -34,6 +47,8 @@ Carry the mean, the covariance and V; the next layer's V solves an exact equatio
 | `lvlib.py` | the estimator: law vertex, both variance rules (`lvt2_chain`, `solve_V2`) |
 | `lv2.py` | runs the estimator with the exact variance rule, plus the leading-order rule and first-order controls |
 | `verify_v2.py` | checks the variance recursion against exact samples of the law, without truth |
+| `THEOREM.md` | theorems and proofs behind the method |
+| `verify_theorem.py`, `verify_theorem.log` | numerical checks of every statement in THEOREM.md |
 | `VRULE.md` | derivation of the exact scale-variance recursion |
 | `conv.py` | the truth-free convergence rule that sets the pair-vertex quadrature |
 | `expo.py` | the width exponent of the margin over sampling, with bootstrap intervals |
