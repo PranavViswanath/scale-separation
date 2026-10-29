@@ -479,7 +479,7 @@ def lvt2_chain(Ws, L, R=16, mode="full", b_up=6.5, rule="v2", trace=None):
         if trace is not None: trace.append(dict(Eh=Eh.clone()))
         if last: break
         _, Cov, k4, T4 = out
-        Vn = solve_V2(T4, Eh, Cov, mode) if rule in ("v2", "v2f") else solve_V(k4, Eh, Cov, mode)
+        Vn = 0.0 if rule == "zero" else (solve_V2(T4, Eh, Cov, mode) if rule in ("v2", "v2f") else solve_V(k4, Eh, Cov, mode))   # zero: V = 0 control (R196)
         W = Ws[l + 1]; mu = W @ Eh; Sig = W @ Cov @ W.T
         Vf = V_feasible(mu, Sig, mode) if rule == "v2f" else np.inf
         if Vf < Vn: Vn = Vf; V2FLAGS.append("feas")

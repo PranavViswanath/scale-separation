@@ -1,5 +1,5 @@
 """lv2.py cell: arms LVT (old leading-order V rule, = lvt_chain), LVTV2 (V2 rule + feasibility cap, Gamma s_k), LVTV2f1 (V2 rule, first-order s_k).
-R from argv (24 = the converged setting chosen by the truth-free rule, PREREG R194a; 16 was the earlier frozen value), b = 6.5. Flops: ARC NamedFlopCounter + ndtr elements (1 each) + scalar special functions (hand count)."""
+R = 16, b = 6.5 (frozen R186d). Flops: ARC NamedFlopCounter + ndtr elements (1 each) + scalar special functions (hand count)."""
 import sys, time, numpy as np, torch
 torch.set_grad_enabled(False); torch.backends.cuda.matmul.allow_tf32 = False
 from mlp_kprop.flop_utils import NamedFlopCounter, flop_name
@@ -12,7 +12,7 @@ lvlib.ndtr = nd
 res = {}
 for t in range(Wall.shape[0]):
     Ws = [torch.tensor(np.asarray(w), dtype=torch.float64, device="cuda") for w in Wall[t]]
-    for arm, mode, rule in (("LVT", "full", "lead"), ("LVTV2", "full", "v2f"), ("LVTV2f1", "first", "v2f")):
+    for arm, mode, rule in (("LVT", "full", "lead"), ("LVTV2", "full", "v2f"), ("LVTV2f1", "first", "v2f")) + ((("LVT0", "full", "zero"),) if cell == "I" else ()):
         NDTR[0] = 0; lvlib.SCAL[0] = 0; lvlib.V2FLAGS.clear(); t0 = time.time(); fc = NamedFlopCounter()
         with fc:
             with flop_name("lv2"):

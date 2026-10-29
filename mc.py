@@ -1,12 +1,13 @@
 """mc.py cell [log2N=30]: MC truth per net, two independent halves (disjoint generator seeds), f32 forward with TF32 OFF, f64 accumulation.
 Saves per net: half sums of h_L (=act{L-1}) and of the output y = W_out h_L; per-sample second moments (naive), radial-exact estimator r_bar/|x| * h,
 antithetic (h(x)+h(-x))/2 variances (on 2^22 pairs), and Var_eff = LS (2,2) coefficient of kappa4(z_L) over a != b (2^23 samples)."""
-import sys, math, time, numpy as np, torch
+import sys, os, math, time, numpy as np, torch
 torch.backends.cuda.matmul.allow_tf32 = False; torch.backends.cudnn.allow_tf32 = False
 cell = sys.argv[1]; LG = int(sys.argv[2]) if len(sys.argv) > 2 else 30
 d = np.load(f"nets_{cell}.npz"); Wall = d["W"]; n = int(d["n"]); L = int(d["L"])
-torch.cuda.set_per_process_memory_fraction(0.25)
-dev = "cuda"; B = 2**20 if n <= 128 else 2**19
+torch.cuda.set_per_process_memory_fraction(0.7 if n >= 1024 else 0.25)  # n = 1024: 0.25 and 0.45 OOMed in the antithetic stage (R196 run; prior-net temporaries still alive)
+dev = "cuda"; B = 2**20 if n <= 128 else (2**19 if n < 1024 else 2**17)   # n = 1024 on the Spark (unified 121 GB): 2**17 (R197)
+ANT = int(os.environ.get("ANT", "23"))   # log2 antithetic pairs / Var_eff draws; R197: 20 at cell I on the Spark
 rbar = math.sqrt(2) * math.exp(math.lgamma((n + 1) / 2) - math.lgamma(n / 2))  # E|x|, x ~ N(0, I_n)
 import os
 out = np.load(f"mc_{cell}.npy", allow_pickle=True).item() if os.path.exists(f"mc_{cell}.npy") else {}
@@ -42,7 +43,7 @@ for t in range(Wall.shape[0]):
     s_a = torch.zeros(n, dtype=torch.float64, device=dev); s_a2 = torch.zeros_like(s_a); s_ra = torch.zeros_like(s_a); s_ra2 = torch.zeros_like(s_a)
     m1 = torch.zeros(n, dtype=torch.float64, device=dev); m2 = torch.zeros(n, n, dtype=torch.float64, device=dev); m22 = torch.zeros(n, n, dtype=torch.float64, device=dev)
     NA = 0; zc = None
-    for b in range(max(1, 2**23 // B)):
+    for b in range(max(1, 2**ANT // B)):
         x = torch.randn(B, n, device=dev, generator=g)
         z, h = fwd(x); _, hn = fwd(-x)
         a = 0.5 * (h.double() + hn.double()); s_a += a.sum(0); s_a2 += (a * a).sum(0)

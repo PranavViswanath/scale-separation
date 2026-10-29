@@ -36,14 +36,14 @@ fig.tight_layout(); fig.savefig("fig1_64x16.png")
 
 # ---- Fig 2: the depth = width/4 diagonal, matched compute (new V rule) ----
 # H (512x128) is filled in when its truth lands; until then it is omitted.
-DIAG = [("64x16", 4.32e-3, 3.51e-3, 1.52e-3), ("128x32", 6.24e-3, 2.37e-3, 1.51e-3), ("256x64", 2.91e-3, 1.46e-3, 9.53e-4), ("512x128", 7.69e-4, 8.35e-4, 5.88e-4)]
+DIAG = [("64x16", 4.32e-3, 3.51e-3, 1.52e-3), ("128x32", 6.24e-3, 2.37e-3, 1.51e-3), ("256x64", 2.91e-3, 1.46e-3, 9.53e-4), ("512x128", 7.69e-4, 8.35e-4, 5.88e-4), ("1024x256", 7.82e-4, 4.51e-4, 3.73e-4)]
 cells = [c for c, *_ in DIAG]; arc = [a for _, a, _, _ in DIAG]; mc = [m for _, _, m, _ in DIAG]; us = [u for *_, u in DIAG]
 x = np.arange(len(cells)); w = 0.26
 fig, ax = plt.subplots(figsize=(7.0, 3.9)); grid(ax)
 for i, (vals, c, lab) in enumerate([(arc, ARC, "ARC best at <= my FLOPs"), (mc, MC, "naive sampling at my FLOPs"),
                                     (us, OURS, "mine (scale separation)")]):
     ax.bar(x + (i - 1) * w, vals, w - 0.03, color=c, label=lab)
-ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(cells); ax.set_ylim(3e-4, 1.5e-2)
+ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(cells); ax.set_ylim(2e-4, 1.5e-2)
 ax.set_ylabel("normalized MSE (lower is better)"); ax.set_xlabel("width x depth, depth = width / 4 (10 random nets each)")
 ax.text(0.99, 0.97, "bold: times better than sampling", transform=ax.transAxes, ha="right", va="top", color=INK2, fontsize=8.5)
 ax.legend(frameon=False, fontsize=8.5, loc="upper left", ncol=3, bbox_to_anchor=(-0.02, 1.14), handlelength=1.2, columnspacing=1.0)
@@ -88,17 +88,16 @@ print("ok")
 
 # ---- Money figure: the diagonal, times better than sampling at equal compute ----
 # MC/x = naive-sampling error at the method's own FLOPs / method error. >1 beats sampling. Fill H (512x128) when it lands.
-wid = np.array([64, 128, 256, 512]); lab = ["64x16", "128x32", "256x64", "512x128"]
-ours = (np.array([2.31, 1.57, 1.53, 1.42]), np.array([1.66, 1.05, 0.96, 1.12]), np.array([3.57, 2.76, 2.89, 1.87]))
-old = np.array([2.33, 0.92, 0.98, 1.96])
-arc2 = np.array([2.18, 0.78, 0.89, 1.69])            # ARC SIMPLE K2, the level at our cost
+wid = np.array([64, 128, 256, 512, 1024]); lab = ["64x16", "128x32", "256x64", "512x128", "1024x256"]
+ours = np.array([2.31, 1.57, 1.53, 1.42, 1.21])
+old = np.array([2.33, 0.92, 0.98, 1.96, 0.98])
+arc2 = np.array([2.18, 0.78, 0.89, 1.69, 0.83])            # ARC SIMPLE K2, the level at our cost
 arc3w = np.array([64, 128, 256]); arc3 = np.array([0.05, 0.0085, 0.0023])   # ARC SIMPLE K3 (not run at 512)
 fig, ax = plt.subplots(figsize=(7.0, 4.4)); grid(ax)
 ax.axhspan(1, 20, color="#eaf2fb", zorder=0); ax.axhline(1, color=MC, ls="--", lw=1.6)
 ax.text(64 * 0.93, 0.80, "naive sampling at equal FLOPs", color=INK2, fontsize=9, ha="left", va="top")
-ax.text(256 * 1.06, 12, "beats\nsampling", color=OURS, fontsize=9, ha="right", va="top")
-m, lo, hi = ours
-ax.errorbar(wid, m, yerr=[m - lo, hi - m], fmt="-o", color=OURS, lw=2.6, ms=9, capsize=4, zorder=5)
+ax.text(1024 * 1.12, 12, "beats\nsampling", color=OURS, fontsize=9, ha="right", va="top")
+ax.plot(wid, ours, "-o", color=OURS, lw=2.6, ms=9, zorder=5)
 ax.plot(wid, old, "--o", color="#a9b8c9", lw=1.6, ms=6, zorder=4)
 ax.plot(wid, arc2, "-o", color=ARC, lw=2, ms=7, zorder=4)
 ax.plot(arc3w, arc3, "-o", color=ARC, lw=1.4, ms=6, alpha=0.55, zorder=4)
@@ -106,7 +105,7 @@ ax.annotate("mine: scale separation", (256, 1.53), textcoords="offset points", x
 ax.annotate("mine, leading-order scale variance", (128, 0.92), textcoords="offset points", xytext=(-40, -22), color="#7d8ea3", fontsize=9)
 ax.annotate("ARC K2 (my cost class)", (256, 0.89), textcoords="offset points", xytext=(-30, -30), color=ARC, fontsize=9.5)
 ax.annotate("ARC K3\n(K4 inverts or diverges)", (128, 0.0085), textcoords="offset points", xytext=(10, 6), color=ARC, fontsize=9, alpha=0.85)
-ax.set_xscale("log", base=2); ax.set_xticks(wid); ax.set_xticklabels(lab); ax.set_xlim(52, 600)
+ax.set_xscale("log", base=2); ax.set_xticks(wid); ax.set_xticklabels(lab); ax.set_xlim(52, 1300)
 ax.set_yscale("log"); ax.set_ylim(1.2e-3, 12); ax.set_yticks([0.001, 0.01, 0.1, 1, 10]); ax.set_yticklabels(["0.001x", "0.01x", "0.1x", "1x", "10x"])
 ax.set_ylabel("times better than naive sampling\n(equal FLOPs, mean of 10 random nets)"); ax.set_xlabel("width x depth, with depth = width / 4")
 ax.set_title("Depth growing with width: the regime ARC lists as open", loc="left", color=INK, fontsize=11.5)

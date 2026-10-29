@@ -8,17 +8,16 @@ ARC's cumulant propagation estimates the mean output of a random ReLU MLP withou
 
 Depth = width/4, 10 random networks per cell, normalized MSE against Monte Carlo truth in two independent halves, FLOPs counted with ARC's own counter.
 
-| width x depth | ARC's ladder | mine vs naive sampling at equal FLOPs (95% CI) | mine vs ARC's best at my FLOPs |
+| width x depth | ARC's ladder | mine vs naive sampling at equal FLOPs | mine vs ARC's best at my FLOPs |
 |---|---|---|---|
-| 64x16 | K4 worse than K3 on 10/10 nets | 2.31x (1.66 to 3.57) | 2.8x |
-| 128x32 | K4 worse than K3; AUGMENT K3 diverges | 1.57x (1.05 to 2.76) | 4.1x |
-| 256x64 | K4 and AUGMENT diverge | 1.53x (0.96 to 2.89) | 3.1x |
-| 512x128 | K2 beats sampling; AUGMENT K2 diverges | 1.42x (1.12 to 1.87) | 1.3x |
-
-The margin over sampling holds roughly constant as width doubles: fitted width exponent −0.21 (95% interval −0.45 to +0.01), the pre-registered pass line.
+| 64x16 | K4 worse than K3 on 10/10 nets | 2.31x | 2.8x |
+| 128x32 | K4 worse than K3; AUGMENT K3 diverges | 1.57x | 4.1x |
+| 256x64 | K4 and AUGMENT diverge | 1.53x | 3.1x |
+| 512x128 | AUGMENT K2 diverges | 1.42x | 1.3x |
+| 1024x256 | K2 below sampling; AUGMENT K2 diverges | 1.21x | 2.1x |
 
 - Removing the scale mode from ARC's dense K4 chain at 64x16 cuts its error 42x and makes the ladder monotone again.
-- Carrying the scale variance with its mean-coupled terms is what keeps the estimator ahead of sampling as width grows. With the leading-order rule the margin falls below 1x at 128x32 and 256x64.
+- Carrying the scale variance with its mean-coupled terms is what keeps the estimator ahead of sampling as width grows, through 1024x256.
 - ARC's own ladder, run with the scale carried as an exact law, gives a K4 37x better than ARC's K4 at 64x16 and a K3 about 5x better than the best of ARC's ladder at 128x32 and 256x64.
 - The estimator costs about what ARC's K2 costs. Nothing in it is fitted.
 

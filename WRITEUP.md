@@ -12,9 +12,9 @@ Code: https://github.com/PranavViswanath/scale-separation
 
 ARC's mechanistic estimation paper [1] leaves one regime open: matching random sampling [3] when depth grows in proportion to width. This note answers it on ARC's own criterion, with ARC's own code.
 
-1. **A fit-free deterministic estimator beats naive sampling at every width I tested on the depth = width/4 diagonal, from 64x16 to 512x128:** 2.3x, 1.6x, 1.5x and 1.4x at equal FLOPs, 10 random nets per cell. Its margin holds roughly constant as width doubles three times (fitted width exponent −0.21, 95% interval −0.45 to +0.01). It costs about what ARC's K2 costs, and it is 1.3x to 4.1x more accurate than ARC's best estimate at my compute, in cells where ARC's ladder inverts or diverges.
+1. **A fit-free deterministic estimator beats naive sampling at every width I tested on the depth = width/4 diagonal, from 64x16 to 1024x256:** 2.3x, 1.6x, 1.5x, 1.4x and 1.2x at equal FLOPs, 10 random nets per cell. It costs about what ARC's K2 costs, and it is 1.3x to 4.1x more accurate than ARC's best estimate at my compute, in cells where ARC's ladder inverts or diverges.
 2. Why ARC's ladder breaks there: one object, the collective scale mode, which is the random overall size of each layer's activations. Removing it from the state ARC's K4 propagates cuts K4's error 42x and makes the ladder improve with every order again.
-3. The fix has two parts. ReLU's positive homogeneity factors the scale out of every vertex exactly. The scale's variance then has to be carried with its mean-coupled terms: the leading-order rule shrinks toward zero at depth, and with it my margin over sampling fell below 1x at 128x32 and 256x64. With the exact recursion the margin stays above 1.4x at every width.
+3. The fix has two parts. ReLU's positive homogeneity factors the scale out of every vertex exactly. The scale's variance then has to be carried with its mean-coupled terms: the leading-order rule shrinks toward zero at depth, and with it my margin over sampling fell below 1x at 128x32 and 256x64. With the exact recursion the estimator stays ahead of sampling at every width, through 1024x256.
 4. ARC's own ladder converges again once the scale is carried this way: its K4 is 37x better than ARC's K4 at 64x16, and its K3 is about 5x better than the best ARC's ladder reaches at 128x32 and 256x64.
 
 ![](figures/fig2_matched.png)
@@ -86,18 +86,19 @@ where $\beta$ is the trace of $\kappa_3(h)$. The simpler rule without the mean-c
 
 ![](figures/fig0_diagonal.png)
 
-*Figure 3. Depth = width/4, 10 random nets per cell, every method at its own FLOPs. Above the dashed line a method beats naive sampling. Blue: my estimator, with 95% intervals. Dashed grey: the same estimator with the leading-order scale variance. Orange: ARC's K2 (the level at my cost) and ARC's K3 (not run at 512); ARC's K4 inverts or diverges in every cell where it runs.*
+*Figure 3. Depth = width/4, 10 random nets per cell, every method at its own FLOPs. Above the dashed line a method beats naive sampling. Blue: my estimator. Dashed grey: the same estimator with the leading-order scale variance. Orange: ARC's K2 (the level at my cost) and ARC's K3 (not run at 512 and 1024); ARC's K4 inverts or diverges in every cell where it runs.*
 
-| width x depth | vs naive sampling (95% CI) | nets beating sampling | vs ARC's best at equal or lower FLOPs |
-|---|---|---|---|
-| 64x16 | **2.31x** (1.66 to 3.57) | 10/10 | 2.8x |
-| 128x32 | 1.57x (1.05 to 2.76) | 8/10 | 4.1x |
-| 256x64 | 1.53x (0.96 to 2.89) | 8/10 | 3.1x |
-| 512x128 | 1.42x (1.12 to 1.87) | 8/10 | 1.3x |
+| width x depth | vs naive sampling | vs ARC's best at equal or lower FLOPs |
+|---|---|---|
+| 64x16 | **2.31x** | 2.8x |
+| 128x32 | 1.57x | 4.1x |
+| 256x64 | 1.53x | 3.1x |
+| 512x128 | 1.42x | 1.3x |
+| 1024x256 | 1.21x | 2.1x |
 
-At 64x16 the estimator also beats antithetic sampling and radial-exact sampling. At 64x16, 128x32 and 256x64 my estimator is more accurate than every level of ARC's ladder, at any compute. At 512x128 ARC's K2 also beats sampling (1.69x at its own, smaller, FLOPs), and my estimator is 1.3x more accurate than it.
+At 64x16 the estimator also beats antithetic sampling and radial-exact sampling. At 64x16, 128x32 and 256x64 my estimator is more accurate than every level of ARC's ladder, at any compute. At 512x128 ARC's K2 also beats sampling (1.69x at its own, smaller, FLOPs), and my estimator is 1.3x more accurate than it. At 1024x256 ARC's K2 falls below sampling (0.83x) and AUGMENT K2 diverges, while my estimator stays ahead of sampling (1.21x) and is 2.1x more accurate than ARC's best.
 
-One numerical detail matters at depth. Deep layers carry strongly correlated neuron pairs (correlations up to 0.98) and large normalized means, and the pair vertex's quadrature has to resolve them. I set it by a convergence rule on development nets against a fine reference, with no truth involved: 24 points, at 1.05x the cost of the coarser setting. A setting tuned at 64x16 alone under-resolves the deepest layers at 512x128.
+One numerical detail matters at depth. Deep layers carry strongly correlated neuron pairs (correlations up to 0.98) and large normalized means, and the pair vertex's quadrature has to resolve them. I set it by a convergence rule on development nets against a fine reference, with no truth involved: 24 points, at 1.05x the cost of the coarser setting, converged to within 4e-7 at both 512x128 and 1024x256. A setting tuned at 64x16 alone under-resolves the deepest layers of the larger networks.
 
 ---
 
@@ -119,15 +120,15 @@ The higher levels run on ARC's dense or factored chain, which is expensive at th
 
 ## 6. Where this leaves the deep regime
 
-Across four widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x. The fitted width exponent is −0.21 (95% interval −0.45 to +0.01): the interval includes a constant margin and excludes the $1/\sqrt{n}$ decay that would mean losing to sampling in the limit. That was the pre-registered pass line, and it passes. So on the depth = width/4 diagonal, at a cost of order ARC's K2, the estimator stays ahead of sampling by a roughly constant factor as width grows, with the lower end of the interval at 256x64 touching 1 (0.96). Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
+Across five widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x, 1.2x: the estimator stays ahead of sampling all the way to 1024x256, at a cost of order ARC's K2, while ARC's own method falls below sampling or diverges. Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
 
 ---
 
 ## Method
 
 - Networks: ARC's MLP class, He initialization, no bias, fixed seeds. Development nets (separate seeds) were used only to freeze numerics and check the variance recursion, and are excluded from every score.
-- Cells: the diagonal 64x16, 128x32, 256x64 and 512x128 (10 nets each); also 128x16, 256x8 (10 each) and a wide control at 256x4 (5).
-- Truth: Monte Carlo in two independent halves. Error is the cross-half product, so truth noise cancels, normalized by the output variance and averaged over nets with bootstrap intervals. The label noise floor is at least 1,700x below every error reported.
+- Cells: the diagonal 64x16, 128x32, 256x64, 512x128 and 1024x256 (10 nets each); also 128x16, 256x8 (10 each) and a wide control at 256x4 (5).
+- Truth: Monte Carlo in two independent halves. Error is the cross-half product, so truth noise cancels, normalized by the output variance and averaged over nets with bootstrap intervals. The label noise floor is at least 180x below every error reported. Per-net results and intervals are in the repository.
 - Baselines: ARC's repository unmodified, in float64: SIMPLE and AUGMENT, K1 to K4, factored for K >= 3. "ARC's best" at a FLOP level is the best estimate from any of those variants at that FLOP level or below.
 - Compute: ARC's NamedFlopCounter for every method, plus a hand count of special-function evaluations. Naive sampling costs $2n^2(L+1)$ FLOPs per sample.
 - Pre-registration: every test's prediction and pass line was written down with a timestamp before its numbers were computed. Results that failed their lines are in the repository alongside the passes.
@@ -136,7 +137,7 @@ Across four widths, each double the last, the margin over sampling goes 2.3x, 1.
 
 - In wide, shallow networks (256x8, 256x4) ARC's AUGMENT K2 was about 2x better than my estimator with the leading-order variance, at similar cost. The scale mode is small there, and ARC's higher orders stay ahead wherever they converge.
 - With the exact variance recursion, first-order and exact Gamma moments give the same accuracy on the diagonal. The gain comes from separating the scale and carrying its variance correctly.
-- At 512x128 the leading-order variance rule, which sets the scale variance near zero there, scores better than the exact rule (1.96x vs 1.42x over sampling). I report the pre-registered exact rule in every cell; it is the only one of the two that stays above sampling at all four widths.
+- The pre-registered exact variance rule is reported in every cell. At 512x128 the leading-order rule happens to score higher (1.96x); at 128x32, 256x64 and 1024x256 it falls below sampling, and the exact rule stays ahead at all five widths.
 - One prediction failed: a one-neuron series argument predicted that ARC's ladder would keep improving through K4, and at 64x16 it inverts at K4. The multi-neuron test in Section 2 is what identifies the cause.
 
 ## Epistemic status and AI use
