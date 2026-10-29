@@ -113,16 +113,14 @@ fig.tight_layout(); fig.savefig("fig0_diagonal.png")
 
 # ---- Fig 5: the challenge cell, 1024x16 (Phase 2 public nets, 1e9-sample truth), with and without scale separation ----
 # challenge_1024x16/README.md and docs/PREREG.md C1. Per-net final-layer MSE (1e-8).
-CH = [("Graded entry 336823\n(official runner, 12 nets)",
-       [5.36, 4.51, 5.05, 5.27, 4.86, 3.59, 3.80, 4.17, 5.00, 4.75, 4.10, 4.61],
-       [2.46, 2.31, 2.73, 2.79, 2.66, 2.51, 2.51, 3.02, 2.33, 3.16, 2.58, 2.74]),
+CH = [
       ("ARC factored K3 SIMPLE\n(12 nets)",
        [3.71, 4.46, 4.59, 4.09, 3.63, 3.23, 3.61, 3.66, 4.41, 3.78, 3.64, 3.83],
        [2.78, 3.34, 3.22, 3.38, 3.26, 2.97, 2.96, 3.22, 2.80, 3.18, 3.00, 3.22]),
       ("ARC factored K3 AUGMENT\n(6 nets)",
        [2.06, 1.99, 2.08, 2.18, 1.83, 1.45],
        [1.31, 1.42, 1.46, 1.43, 1.27, 1.15])]
-fig, ax = plt.subplots(figsize=(7.0, 3.6)); grid(ax)
+fig, ax = plt.subplots(figsize=(7.0, 2.8)); grid(ax)
 rng = np.random.default_rng(0)
 for i, (lab, off, on) in enumerate(CH):
     y = len(CH) - 1 - i; off = np.array(off); on = np.array(on); jit = rng.uniform(-0.13, 0.13, len(off))
@@ -138,5 +136,5 @@ ax.set_ylim(-0.45, len(CH) - 0.35)
 ax.set_xlabel("final-layer MSE (x 1e-8), challenge truth")
 ax.scatter([], [], s=22, color=MC, label="without scale separation"); ax.scatter([], [], s=22, color=OURS, label="with scale separation")
 ax.legend(frameon=False, fontsize=8.5, loc="lower right")
-ax.set_title("The challenge cell, width 1024, depth 16", loc="left", color=INK, fontsize=11.5)
+ax.set_title("The challenge cell, width 1024, depth 16: ARC's factored K3", loc="left", color=INK, fontsize=11.5)
 fig.tight_layout(); fig.savefig("fig5_challenge.png")

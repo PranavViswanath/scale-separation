@@ -21,7 +21,7 @@ Depth = width/4, 10 random networks per cell, normalized MSE against Monte Carlo
 - ARC's own ladder, run with the scale carried as an exact law, gives a K4 37x better than ARC's K4 at 64x16 and a K3 about 5x better than the best of ARC's ladder at 128x32 and 256x64.
 - The estimator costs about what ARC's K2 costs. Nothing in it is fitted.
 
-At the challenge's own shape, 1024x16 (the challenge's nets and 1e9-sample truth), switching scale separation off in my graded entry 336823 makes its leaderboard score 1.73x worse (6.79e-9 to 1.17e-8, 12/12 nets, same compute). Inside ARC's factored K3 it lowers the final-layer error 1.25x (SIMPLE, 12/12 nets) and 1.44x (AUGMENT, 6/6). These were measured on 29 Oct 2026, after the write-up was first posted; see `challenge_1024x16/`.
+At the challenge's own shape, 1024x16, the separation lowers ARC's factored K3 error 1.25x (SIMPLE) and 1.44x (AUGMENT) on every net tested, and switching it off makes my graded entry's score 1.73x worse. Measured 29 Oct 2026, after the write-up was posted; see `challenge_1024x16/`.
 
 ## The idea in three lines
 
@@ -33,7 +33,7 @@ Carry the mean, the covariance and V; the next layer's V solves an exact equatio
 
 Everything in this repository outside `extensions/` and `challenge_1024x16/`, through the 1024x256 cell, is my Phase 2 Algorithmic Contribution to ARC. That state is tagged `phase2-submission`; the tag keeps the original flat file layout, and the folders here only move those files.
 
-`challenge_1024x16/` holds measurements made after the write-up was posted, on the submitted entry and on ARC's ladder at the challenge shape; the write-up's Section 7 reports them. `extensions/` holds work I did afterwards, on my own, extending the theory. It is not part of the submission. I share it in case it is useful to ARC.
+`challenge_1024x16/` holds the 1024x16 measurements, made after the write-up was posted (Section 7). `extensions/` holds work I did afterwards, on my own, extending the theory. It is not part of the submission. I share it in case it is useful to ARC.
 
 ## Layout
 
@@ -44,7 +44,7 @@ Everything in this repository outside `extensions/` and `challenge_1024x16/`, th
 | `evaluation/` | networks, Monte Carlo truth and scoring |
 | `docs/` | the variance-rule derivation and the pre-registration log |
 | `figures/` | the write-up's figures and the script that draws them |
-| `challenge_1024x16/` | the challenge cell: ARC's K2 and K3 with and without the scale law, and the graded entry with and without it |
+| `challenge_1024x16/` | the challenge cell, 1024x16 |
 | `extensions/` | post-submission work (see above) |
 
 | file | what it does |
