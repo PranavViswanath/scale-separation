@@ -120,7 +120,7 @@ The higher levels run on ARC's dense or factored chain, which is expensive at th
 
 ## 6. Where this leaves the deep regime
 
-Across five widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x, 1.2x: the estimator stays ahead of sampling all the way to 1024x256, at a cost of order ARC's K2, while ARC's own method falls below sampling or diverges. Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
+Across five widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x, 1.2x: the estimator stays ahead of sampling all the way to 1024x256, at a cost of order ARC's K2, while ARC's ladder inverts or diverges above K2. Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
 
 ---
 
