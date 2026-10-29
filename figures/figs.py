@@ -40,8 +40,8 @@ DIAG = [("64x16", 4.32e-3, 3.51e-3, 1.52e-3), ("128x32", 6.24e-3, 2.37e-3, 1.51e
 cells = [c for c, *_ in DIAG]; arc = [a for _, a, _, _ in DIAG]; mc = [m for _, _, m, _ in DIAG]; us = [u for *_, u in DIAG]
 x = np.arange(len(cells)); w = 0.26
 fig, ax = plt.subplots(figsize=(7.0, 3.9)); grid(ax)
-for i, (vals, c, lab) in enumerate([(arc, ARC, "ARC best at <= our FLOPs"), (mc, MC, "naive sampling at our FLOPs"),
-                                    (us, OURS, "ours (scale separation)")]):
+for i, (vals, c, lab) in enumerate([(arc, ARC, "ARC best at <= my FLOPs"), (mc, MC, "naive sampling at my FLOPs"),
+                                    (us, OURS, "mine (scale separation)")]):
     ax.bar(x + (i - 1) * w, vals, w - 0.03, color=c, label=lab)
 ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(cells); ax.set_ylim(3e-4, 1.5e-2)
 ax.set_ylabel("normalized MSE (lower is better)"); ax.set_xlabel("width x depth, depth = width / 4 (10 random nets each)")
@@ -102,9 +102,9 @@ ax.errorbar(wid, m, yerr=[m - lo, hi - m], fmt="-o", color=OURS, lw=2.6, ms=9, c
 ax.plot(wid, old, "--o", color="#a9b8c9", lw=1.6, ms=6, zorder=4)
 ax.plot(wid, arc2, "-o", color=ARC, lw=2, ms=7, zorder=4)
 ax.plot(arc3w, arc3, "-o", color=ARC, lw=1.4, ms=6, alpha=0.55, zorder=4)
-ax.annotate("ours: scale separation", (256, 1.53), textcoords="offset points", xytext=(-150, 26), color=OURS, fontsize=10.5, fontweight="bold")
-ax.annotate("ours, leading-order scale variance", (128, 0.92), textcoords="offset points", xytext=(-40, -22), color="#7d8ea3", fontsize=9)
-ax.annotate("ARC K2 (same cost class)", (256, 0.89), textcoords="offset points", xytext=(-30, -30), color=ARC, fontsize=9.5)
+ax.annotate("mine: scale separation", (256, 1.53), textcoords="offset points", xytext=(-150, 26), color=OURS, fontsize=10.5, fontweight="bold")
+ax.annotate("mine, leading-order scale variance", (128, 0.92), textcoords="offset points", xytext=(-40, -22), color="#7d8ea3", fontsize=9)
+ax.annotate("ARC K2 (my cost class)", (256, 0.89), textcoords="offset points", xytext=(-30, -30), color=ARC, fontsize=9.5)
 ax.annotate("ARC K3\n(K4 inverts or diverges)", (128, 0.0085), textcoords="offset points", xytext=(10, 6), color=ARC, fontsize=9, alpha=0.85)
 ax.set_xscale("log", base=2); ax.set_xticks(wid); ax.set_xticklabels(lab); ax.set_xlim(52, 600)
 ax.set_yscale("log"); ax.set_ylim(1.2e-3, 12); ax.set_yticks([0.001, 0.01, 0.1, 1, 10]); ax.set_yticklabels(["0.001x", "0.01x", "0.1x", "1x", "10x"])

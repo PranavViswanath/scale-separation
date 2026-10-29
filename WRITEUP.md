@@ -10,7 +10,7 @@ Code: https://github.com/PranavViswanath/scale-separation
 
 ## The result
 
-ARC's mechanistic estimation paper [1] leaves one regime open: matching random sampling when depth grows in proportion to width. This note answers it on ARC's own criterion, with ARC's own code.
+ARC's mechanistic estimation paper [1] leaves one regime open: matching random sampling [3] when depth grows in proportion to width. This note answers it on ARC's own criterion, with ARC's own code.
 
 1. **A fit-free deterministic estimator beats naive sampling at every width I tested on the depth = width/4 diagonal, from 64x16 to 512x128:** 2.3x, 1.6x, 1.5x and 1.4x at equal FLOPs, 10 random nets per cell. Its margin holds roughly constant as width doubles three times (fitted width exponent −0.21, 95% interval −0.45 to +0.01). It costs about what ARC's K2 costs, and it is 1.3x to 4.1x more accurate than ARC's best estimate at my compute, in cells where ARC's ladder inverts or diverges.
 2. Why ARC's ladder breaks there: one object, the collective scale mode, which is the random overall size of each layer's activations. Removing it from the state ARC's K4 propagates cuts K4's error 42x and makes the ladder improve with every order again.
@@ -21,7 +21,7 @@ ARC's mechanistic estimation paper [1] leaves one regime open: matching random s
 
 *Figure 1. Depth = width/4, 10 random nets per cell. For each cell: ARC's best estimate at or below my FLOPs, naive sampling at my FLOPs, and mine. Bold: how many times lower my error is than sampling's.*
 
-Everything below uses ARC's repository (commit 93d091a, unmodified) [2], its FLOP counter, many random nets per cell, and predictions written down with timestamps before the numbers were computed.
+Everything below uses ARC's cumulant propagation [4] as implemented in its repository (commit 93d091a, unmodified) [2], its FLOP counter, many random nets per cell, and predictions written down with timestamps before the numbers were computed.
 
 ---
 
