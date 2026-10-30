@@ -2,7 +2,7 @@
 
 Code for "Addressing cumulant propagation's depth problem with scale separation" (WRITEUP.md), a submission to ARC's Algorithmic Contribution Prize.
 
-ARC's cumulant propagation estimates the mean output of a random ReLU MLP without running it, and its paper leaves one regime open: depth growing in proportion to width. ARC states it in footnote 7 of their post on the paper, [Mechanistic estimation for wide random MLPs](https://www.alignment.org/blog/mechanistic-estimation-for-wide-random-mlps/): "It remains an open problem to match the performance of random sampling for random MLPs in other regimes, for example, with the depth growing linearly in the width." In that regime ARC's ladder of approximations stops improving and K4 comes out worse than K3. I trace that to one object, the random overall scale of each layer's activations, separate it exactly using ReLU's positive homogeneity, and carry its variance with an exact recursion.
+ARC's cumulant propagation estimates the mean output of a random ReLU MLP without running it, and its paper leaves one regime open: depth growing in proportion to width. ARC states it in footnote 7 of their post on the paper, [Mechanistic estimation for wide random MLPs](https://www.alignment.org/blog/mechanistic-estimation-for-wide-random-mlps/): "It remains an open problem to match the performance of random sampling for random MLPs in other regimes, for example, with the depth growing linearly in the width." In that regime ARC's ladder of approximations stops improving and K4 comes out worse than K3. I trace that to one object, the random overall scale of each layer's activations, separate it exactly using ReLU's positive homogeneity, and carry its variance with an exact recursion. With the scale handled this way, ARC's ladder converges again on the depth = width/4 diagonal, and a K2-cost estimator beats naive sampling at every width tested. The margin over sampling narrows as width grows, so this resolves the ladder's breakdown in that regime and is a substantial step on footnote 7, not a complete answer to it.
 
 ## Results
 
@@ -20,6 +20,7 @@ Depth = width/4, 10 random networks per cell, normalized MSE against Monte Carlo
 - Carrying the scale variance with its mean-coupled terms is what keeps the estimator ahead of sampling as width grows, through 1024x256.
 - ARC's own ladder, run with the scale carried as an exact law, gives a K4 37x better than ARC's K4 at 64x16 and a K3 about 5x better than the best of ARC's ladder at 128x32 and 256x64.
 - The estimator costs about what ARC's K2 costs. Nothing in it is fitted.
+- The margin over sampling narrows with width: its fitted width exponent across the five cells is -0.20 (95% CI [-0.38, -0.04]). The pre-registered pass line (an interval that includes 0) was not met, and at 1024x256 the margin's interval is [0.89, 1.83], with 6 of 10 nets ahead of sampling. See `docs/PREREG.md` (R196/R197) and `evaluation/expo.py`.
 
 At the challenge's own shape, 1024x16, the separation lowers ARC's factored K3 error 1.25x (SIMPLE) and 1.44x (AUGMENT) on every net tested, and it improves my graded entry's leaderboard score 1.73x. Measured 29 Oct 2026, after the write-up was posted; see `challenge_1024x16/`.
 

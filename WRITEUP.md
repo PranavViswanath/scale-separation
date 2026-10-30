@@ -1,6 +1,6 @@
-# Solving cumulant propagation's depth problem with scale separation
+# Addressing cumulant propagation's depth problem with scale separation
 
-*A fit-free estimator that beats sampling at every width tested when depth grows with width*
+*A fit-free estimator that restores ARC's ladder and beats sampling at every width tested when depth grows with width, with a margin that narrows as width grows*
 
 Pranav Viswanath · [X](https://x.com/pranavxviswa)
 
@@ -10,7 +10,7 @@ Code: https://github.com/PranavViswanath/scale-separation
 
 ## The result
 
-ARC's mechanistic estimation paper [1] leaves one regime open: matching random sampling [3] when depth grows in proportion to width. This note answers it on ARC's own criterion, with ARC's own code.
+ARC's mechanistic estimation paper [1] leaves one regime open: matching random sampling [3] when depth grows in proportion to width. This note resolves the ladder's breakdown in that regime and, on ARC's own criterion and with ARC's own code, beats sampling at every width tested through 1024x256. The margin narrows with width (Section 6), so this is a substantial step on the open problem rather than a complete answer to it.
 
 1. **A fit-free deterministic estimator beats naive sampling at every width I tested on the depth = width/4 diagonal, from 64x16 to 1024x256:** 2.3x, 1.6x, 1.5x, 1.4x and 1.2x at equal FLOPs, 10 random nets per cell. It costs about what ARC's K2 costs, and it is 1.3x to 4.1x more accurate than ARC's best estimate at my compute, in cells where ARC's ladder inverts or diverges.
 2. Why ARC's ladder breaks there: one object, the collective scale mode, which is the random overall size of each layer's activations. Removing it from the state ARC's K4 propagates cuts K4's error 42x and makes the ladder improve with every order again.
@@ -121,7 +121,7 @@ The higher levels run on ARC's dense or factored chain, which is expensive at th
 
 ## 6. Where this leaves the deep regime
 
-Across five widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x, 1.2x: the estimator stays ahead of sampling all the way to 1024x256, at a cost of order ARC's K2, while ARC's ladder inverts or diverges above K2. Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
+Across five widths, each double the last, the margin over sampling goes 2.3x, 1.6x, 1.5x, 1.4x, 1.2x: the estimator stays ahead of sampling all the way to 1024x256, at a cost of order ARC's K2, while ARC's ladder inverts or diverges above K2. The margin narrows as width grows: the fitted width exponent of the margin across the five cells is −0.20 (95% bootstrap CI [−0.38, −0.04]), and at 1024x256 the margin's interval is [0.89, 1.83] with 6 of 10 nets ahead of sampling. If the trend continues, a single level of this cost would fall behind sampling at some larger width. Reaching every tolerance at a fixed width needs a level above this one that keeps the scale exact, and Section 5 shows ARC's own ladder converging once it does.
 
 ---
 
@@ -159,6 +159,8 @@ These measurements were made on 29 October 2026, after this write-up was first p
 - With the exact variance recursion, first-order and exact Gamma moments give the same accuracy on the diagonal. The gain comes from separating the scale and carrying its variance correctly.
 - The pre-registered exact variance rule is reported in every cell. At 512x128 the leading-order rule happens to score higher (1.96x); at 128x32, 256x64 and 1024x256 it falls below sampling, and the exact rule stays ahead at all five widths.
 - At the challenge shape (1024x16) my standalone K2-cost estimator is 1.3x worse than ARC's AUGMENT K2; the scale separation helps there as a layer on a K3 chain (Section 7).
+- The pre-registered width test failed. Its pass line required the bootstrap CI of the five-cell width exponent of the margin over sampling to include 0 and exclude −0.5. The measured exponent is −0.20 [−0.38, −0.04], which excludes both. A secondary line, a margin interval above 1 at 1024x256, also failed (lower bound 0.89). The estimator stays ahead of sampling on average in every cell, but the advantage is shrinking with width (`docs/PREREG.md`, R196/R197).
+- The scale-law ladder converges on the diagonal. Off it, at 64x32 (L/n = 1/2), it is not monotone: its level 3 is worse than level 2 (`docs/PREREG.md`, R189).
 - One prediction failed: a one-neuron series argument predicted that ARC's ladder would keep improving through K4, and at 64x16 it inverts at K4. The multi-neuron test in Section 2 is what identifies the cause.
 
 ## Epistemic status and AI use
